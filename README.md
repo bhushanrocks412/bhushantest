@@ -23,7 +23,25 @@ pod install
 import BondBotAO
 ```
 
-2.1) Call below method to open the FAQ ChatBot. (After user logged in, If user wants to navigate to Open FAQ then send requestedBot parameter value as “FAQBOT”)
+2.1) Call below method to open the Account opening ChatBot before login.
+
+```swift
+func navigateToBondBotControllerAO(){
+        DispatchQueue.main.async {
+            let storyBoard : UIStoryboard = UIStoryboard(name: "Chat", bundle:Bundle(for: BondBotAO.self))
+            let bondbotController = storyBoard.instantiateInitialViewController() as! BondBotAO
+            bondbotController.modalPresentationStyle = .fullScreen
+            bondbotController.RequestedBot = "CONVERSATIONBOT"
+            NotificationCenter.default.removeObserver(self)
+            bondbotController.serverURL = self.serverURL
+           //Set language code EN(for english) or ES(for spanish)
+            bondbotController.langCode = "EN"
+            self.present(bondbotController, animated: true, completion: nil)
+        }
+    }
+```
+
+2.2) Call below method to open the FAQ ChatBot. (After user logged in, If user wants to navigate to Open FAQ then send requestedBot parameter value as “FAQBOT”)
 
 ```swift
 func navigateToBondBotController(){
@@ -59,25 +77,9 @@ func navigateToBondBotController(){
 
 ```
 
-2.2) Call below method to open the Account opening ChatBot before login.
 
-```swift
-func navigateToBondBotControllerAO(){
-        DispatchQueue.main.async {
-            let storyBoard : UIStoryboard = UIStoryboard(name: "Chat", bundle:Bundle(for: BondBotAO.self))
-            let bondbotController = storyBoard.instantiateInitialViewController() as! BondBotAO
-            bondbotController.modalPresentationStyle = .fullScreen
-            bondbotController.RequestedBot = "CONVERSATIONBOT"
-            NotificationCenter.default.removeObserver(self)
-            bondbotController.serverURL = self.serverURL
-           //Set language code EN(for english) or ES(for spanish)
-            bondbotController.langCode = "EN"
-            self.present(bondbotController, animated: true, completion: nil)
-        }
-    }
-```
 
-#Parameter values to be set by the parent application(all are mandatory except in Account opening chatbot before login )
+#Parameter values to be set by the parent application(all are mandatory except for External Account opening chatbot before login )
 
 - userEmail -> User Email
 - serverURL -> server URL  
@@ -87,6 +89,7 @@ func navigateToBondBotControllerAO(){
 - langCode -> Language Code
 - RequestedBot - > requestedBot type (ie. “CONVERSATIONBOT” or “FAQBOT”)
 
+Note: you can get above Values(ie:authtoken,userAccesstoken) by calling login Api which is demonstated in demo app.
 
 
 2.3) Set colours & icons from parent app to the botSDK using the below method 
@@ -94,23 +97,23 @@ func navigateToBondBotControllerAO(){
 
 ```swift
 func customiseBotUI() {
-        //If color then set in HEX. i.e. “#0000FF" //If icon then set i.e. "abc.png"
+        //If color then set in HEX. i.e. “#0000FF" or “0000FF" //If icon then set i.e. "abc.png"
       	 botSdkConfigAO.VERSION_TEXT = ""
         botSdkConfigAO.VERSION_MESSAGE_TEXT_COLOR = "#6001D2"
         // set hide/show for show version.
         botSdkConfigAO.SHOWVERSION = true
         // view User msg background
         botSdkConfigAO.USER_MESSGAE_BACKGROUND_COLOR =  "e8e8e8"
-	       // set color for background view of bot message
+	// set color for background view of bot message
         botSdkConfigAO.BOT_MESSGAE_BACKGROUND_COLOR =  "#EEEEEE"
         // set text color for user message
         botSdkConfigAO.USER_MESSGAE_TEXT_COLOR = "EEEEEE"
         // set text color for bot message
         botSdkConfigAO.BOT_MESSGAE_TEXT_COLOR = "4B4B4B"
         //set hyperlink color for bot message
-        botSdkConfigAO.BOT_MESSAGE_URL_TEXT_COLOR = "6001D2"//F8F8F8"
+        botSdkConfigAO.BOT_MESSAGE_URL_TEXT_COLOR = "6001D2"
         //set color for chat screen background. main view, header, footer.
-        botSdkConfigAO.CHAT_SCREEN_BACKGROUND = "FFFFFF"//e8e8e8"
+        botSdkConfigAO.CHAT_SCREEN_BACKGROUND = "FFFFFF"
         // chatTextfield placeholder text
         botSdkConfigAO.INPUT_MSG_TEXT = "Say Something.."
         //chatTextfield placeholder color
@@ -125,7 +128,7 @@ func customiseBotUI() {
         botSdkConfigAO.IMG_BOND_ICON =  "bot_Icon.png"
         // set background color for List message & related question.
         botSdkConfigAO.RELATED_MESSAGE_BACKGROUND = "FFFFFF"
-        //set border color & text color for list message as well as related question. Text color for 		greet message.
+        //set border color & text color for list message as well as related question. Text color for greet message.
         botSdkConfigAO.RELATED_MESSAGE_COLOR = "#009dac"
         // set icon for close button.
         botSdkConfigAO.BACK_IMAGE = “x_white.png"
@@ -134,7 +137,26 @@ func customiseBotUI() {
         botSdkConfigAO.Color_gradient_Bottom = "6001D2"
        }
 ```
-2.4) before submitting on app store you need to insert following Run script given below, in build phases
+
+2.4) Put following Keys in Info.plist file  of your app
+
+```XML
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to the camera.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Require microphone access </string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Require speech recognition access </string>
+```
+
+2.5) before submitting on app store you need to insert following Run script given below, in build phases
 
 ```ruby
 echo "\n ⏱ Removing Unused Architectures \n\n\n"
@@ -169,23 +191,7 @@ echo "\n\n\n 🏁 Completed removing unused architectures from your fat framewor
 echo "\n\n\n 🔍 For more details please check the /tmp/${PROJECT_NAME}_archive.log file. \n\n\n"
 
 ```
-2.5) Put following Keys in Info.plist file  of your app
 
-```XML
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>This app requires access to the camera.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Require microphone access </string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Require speech recognition access </string>
-```
 
 
 ## SDK Installation Requirements
