@@ -1,64 +1,216 @@
-# bhushantest
-testing
+
+# BondBotSDK Integration
+
+## Using CocoaPods
+
+BondBotSDKNew is available through CocoaPods. To install, add the following line to your Pod file and then use command pod install:
+
+```ruby
+pod ‘BondBotSDKNew’, ‘~> 1.3.1’
+```
+This pulls from the `master` branch directly.
+
+Second, install `BondBotSDKNew` into your project:
+
+```ruby
+pod install
+```
+
+## How to use ?
+1) Import BondBotAO.framework.
+
+```swift
+import BondBotAO
+```
+
+2.1) Call below method to open the FAQ ChatBot. (After user logged in, If user wants to navigate to Open FAQ then send requestedBot parameter value as “FAQBOT”)
+
+```swift
+func navigateToBondBotController(){
+          
+        DispatchQueue.main.async {
+            // Use these 3 lines as it is.
+            let storyBoard = UIStoryboard (name: "Chat", bundle: Bundle(for: BondBotAO.self))
+            let bondbotController = storyBoard.instantiateInitialViewController() as! BondBotAO
+            bondbotController.modalPresentationStyle = .fullScreen
+            
+            //Set Server URL
+            bondbotController.serverURL = self.serverURL!
+
+            bondbotController.RequestedBot = "FAQBOT"
+           
+            //Set Username
+            if self.username != nil {
+                 bondbotController.userName = self.username!
+            }
+            //Set Access Token
+            
+            bondbotController.userAccessToken = self.accessToken ?? ""
+            
+            //Set language code EN(for english) or ES(for spanish)
+            bondbotController.langCode = self.langCode
+            
+            //Set Email Address
+            bondbotController.userEmail = self.userEmail ?? ""
+            
+            //Present ChatBot Controller
+            self.present(bondbotController, animated: true, completion: nil)
+        }
+
+```
+
+2.2) Call below method to open the Account opening ChatBot before login.
+
+```swift
+func navigateToBondBotControllerAO(){
+        DispatchQueue.main.async {
+            let storyBoard : UIStoryboard = UIStoryboard(name: "Chat", bundle:Bundle(for: BondBotAO.self))
+            let bondbotController = storyBoard.instantiateInitialViewController() as! BondBotAO
+            bondbotController.modalPresentationStyle = .fullScreen
+            bondbotController.RequestedBot = "CONVERSATIONBOT"
+            NotificationCenter.default.removeObserver(self)
+            bondbotController.serverURL = self.serverURL
+           //Set language code EN(for english) or ES(for spanish)
+            bondbotController.langCode = "EN"
+            self.present(bondbotController, animated: true, completion: nil)
+        }
+    }
+```
+
+#Parameter values to be set by the parent application(all are mandatory except in Account opening chatbot before login )
+
+- userEmail -> User Email
+- serverURL -> server URL  
+- userName -> User Name
+- authToken -> Authentication Token
+- userAccessToken -> Access Token
+- langCode -> Language Code
+- RequestedBot - > requestedBot type (ie. “CONVERSATIONBOT” or “FAQBOT”)
 
 
 
-# Document scanner SDK and MRZ, QR code, barcode scanner
+2.3) Set colours & icons from parent app to the botSDK using the below method 
+(If colors are not set from the Parent App, then default Bond Bot colors & icons will be applied)
 
-## Scanbot SDK example apps for iOS
+```swift
+func customiseBotUI() {
+        //If color then set in HEX. i.e. “#0000FF" //If icon then set i.e. "abc.png"
+      	 botSdkConfigAO.VERSION_TEXT = ""
+        botSdkConfigAO.VERSION_MESSAGE_TEXT_COLOR = "#6001D2"
+        // set hide/show for show version.
+        botSdkConfigAO.SHOWVERSION = true
+        // view User msg background
+        botSdkConfigAO.USER_MESSGAE_BACKGROUND_COLOR =  "e8e8e8"
+	       // set color for background view of bot message
+        botSdkConfigAO.BOT_MESSGAE_BACKGROUND_COLOR =  "#EEEEEE"
+        // set text color for user message
+        botSdkConfigAO.USER_MESSGAE_TEXT_COLOR = "EEEEEE"
+        // set text color for bot message
+        botSdkConfigAO.BOT_MESSGAE_TEXT_COLOR = "4B4B4B"
+        //set hyperlink color for bot message
+        botSdkConfigAO.BOT_MESSAGE_URL_TEXT_COLOR = "6001D2"//F8F8F8"
+        //set color for chat screen background. main view, header, footer.
+        botSdkConfigAO.CHAT_SCREEN_BACKGROUND = "FFFFFF"//e8e8e8"
+        // chatTextfield placeholder text
+        botSdkConfigAO.INPUT_MSG_TEXT = "Say Something.."
+        //chatTextfield placeholder color
+        botSdkConfigAO.PLACEHOLDER_COLOR = "#A6A6A6"
+        //chatTextfield background
+        botSdkConfigAO.INPUT_FIELD_BACKGROUND = "#FFFFFF"
+        //chatTextfield textcolor
+        botSdkConfigAO.INPUT_FIELD_TEXT_COLOR = "#434343"
+        // set icon for send button
+        botSdkConfigAO.BTN_SEND_IMG =  "send.png"
+        // Icon for bot message
+        botSdkConfigAO.IMG_BOND_ICON =  "bot_Icon.png"
+        // set background color for List message & related question.
+        botSdkConfigAO.RELATED_MESSAGE_BACKGROUND = "FFFFFF"
+        //set border color & text color for list message as well as related question. Text color for 		greet message.
+        botSdkConfigAO.RELATED_MESSAGE_COLOR = "#009dac"
+        // set icon for close button.
+        botSdkConfigAO.BACK_IMAGE = “x_white.png"
+        botSdkConfigAO.IMG_BOND_ICON_CAMERA = “ios-camera.png"
+        botSdkConfigAO.Color_gradient_Top = "3985FF"
+        botSdkConfigAO.Color_gradient_Bottom = "6001D2"
+       }
+```
+2.4) before submitting on app store you need to insert following Run script given below, in build phases
 
-These example apps show how to integrate the [Scanbot SDK](https://scanbot.io) for iOS.
+```ruby
+echo "\n ⏱ Removing Unused Architectures \n\n\n"
+
+exec > /tmp/${PROJECT_NAME}_archive.log 2>&1
 
 
-## What is Scanbot SDK?
+FRAMEWORK="BondBotAO"
 
-Scanbot SDK for iOS is a simple to use high level API, providing a collection of classes and functions
-for scanning and processing documents from your mobile device's camera or other image sources like your photo library.
+FRAMEWORK_EXECUTABLE_PATH="${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/$FRAMEWORK.framework/$FRAMEWORK"
 
-Integrate our Ready-To-Use UI Components with only a few lines of code.
-Benefit from a proven user experience, super fast integration time and customizable colors and text to match your brand.
-Or dive into our Classical UI Components and build your fully customized scanning experience.
+EXTRACTED_ARCHS=()
 
-Scanbot SDK consists of a collection of modules, each individually licensable or available in license packages.
+for ARCH in $ARCHS
 
-Currently, the following modules and features are available:
-- Document Detection in digital images
-- User interface for guided, automatic document scanning using the document detection module
-- Image Processing for rotating, cropping, filtering and perspective correction, optimized for the needs of document
-scanning
-- PDF Creation - merge a collection of processed or unprocessed document images and write them into a PDF document with
-one image per page
-- Optical Character Recognition - recognize text in document images and create searchable PDF documents with
-selectable text
-- Payform Recognition - detect and recognize SEPA payforms in images and extract the important data fields via OCR
-- Recognition and Data Extraction from German Medical Certificate forms (also known as Disability Certificate or AU-Bescheinigung)
-- MRZ Scanner - Provides the ability to find and extract Machine Readable Zone (MRZ) content from ID cards, passports and travel documents
+do
+
+lipo -extract "$ARCH" "$FRAMEWORK_EXECUTABLE_PATH" -o "$FRAMEWORK_EXECUTABLE_PATH-$ARCH"
+
+EXTRACTED_ARCHS+=("$FRAMEWORK_EXECUTABLE_PATH-$ARCH")
+
+done
+
+lipo -o "$FRAMEWORK_EXECUTABLE_PATH-merged" -create "${EXTRACTED_ARCHS[@]}"
+
+rm "${EXTRACTED_ARCHS[@]}"
+rm "$FRAMEWORK_EXECUTABLE_PATH"
+mv "$FRAMEWORK_EXECUTABLE_PATH-merged" "$FRAMEWORK_EXECUTABLE_PATH"
+
+echo "\n ⏱ Removing Unused Architectures \n\n\n"
+echo "\n\n\n 🏁 Completed removing unused architectures from your fat framework."
+echo "\n\n\n 🔍 For more details please check the /tmp/${PROJECT_NAME}_archive.log file. \n\n\n"
+
+```
+2.5) Put following Keys in Info.plist file  of your app
+
+```XML
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to the camera.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Require microphone access </string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Require speech recognition access </string>
+```
+
+
+## SDK Installation Requirements
+
+- xcode 12
+- Swift 5.0 or above
+- iOS V11 or above
 
 
 
-## Documentation
+## Supported Devices (Following device with IOS 11 or above)
 
-[View Scanbot SDK Online documentation](https://scanbotsdk.github.io/documentation/ios/)
-
-
-
-## How to run this example app?
-
-- Clone this repository to a local folder
-- Open `ScanbotSDKDemo.xcodeproj` with Xcode, build and run, a build script will automatically download ScanbotSDK to your project folder if needed
-
-- In case you do not want to automatically download the SDK in the Demo app's target, remove the dependency to the 'Download ScanbotSDK' aggregate target and perform the following steps:
-  * [Download the latest Scanbot SDK for iOS from our website](https://scanbot.io/en/sdk/documentation)
-  * Unzip the downloaded zip file and copy the extracted `ScanbotSDK` folder to your local example app folder (`scanbot-sdk-example-ios/ScanbotSDK`)
-  * For Classical UI open `ScanbotSDKDemo.xcodeproj` with Xcode, build and run
-  * For Ready-To-Use UI open `ReadyToUseUIDemo.xcodeproj` with Xcode, build and run
+- IPhone 12,12 pro,12 pro Max
+- IPhone 11,11 pro,11 pro Max
+- IPhone XS,XS Max
+- IPhone XR,X
+- IPhone 8,8 Plus
+- IPhone 7,7 Plus
+- IPhone 6S,6S Plus,6 Plus
+- IPhone SE
+- IPhone 5S
 
 
-## Please note
+## Server URL
+- serverURL will be provided by Bond team.
 
-The Scanbot SDK will run without a license for one minute per session!
+For more Information Contact Mahesh@bond.ai
 
-After the trial period has expired, all Scanbot SDK functions as well as the UI components (like Document Scanner UI) will stop working or may be terminated.
-You have to restart the app to get another trial period.
-
-To get an unrestricted, "no-strings-attached" 30 day trial license, please submit the [Trial License Form](https://scanbot.io/en/sdk/demo/trial) on our website.
